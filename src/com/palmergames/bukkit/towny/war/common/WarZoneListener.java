@@ -26,8 +26,8 @@ import com.palmergames.bukkit.towny.object.Coord;
 import com.palmergames.bukkit.towny.object.Translation;
 import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.palmergames.bukkit.towny.object.PlayerCache.TownBlockStatus;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.regen.TownyRegenAPI;
-import com.palmergames.bukkit.towny.war.eventwar.War;
 import com.palmergames.bukkit.towny.war.eventwar.WarUtil;
 import com.palmergames.bukkit.towny.war.flagwar.FlagWar;
 import com.palmergames.bukkit.towny.war.flagwar.FlagWarConfig;
@@ -138,7 +138,7 @@ public class WarZoneListener implements Listener {
 				continue;
 			
 			// Non-warzone, skip it.
-			if (!War.isWarZone(TownyAPI.getInstance().getTownBlock(block.getLocation()).getWorldCoord()))
+			if (!TownyUniverse.getInstance().hasWarEvent(TownyAPI.getInstance().getTownBlock(block.getLocation())))
 				continue;
 			
 			// A war that doesn't allow any kind of explosions.
@@ -187,7 +187,7 @@ public class WarZoneListener implements Listener {
 		 */
 		
 		// Not in a war zone, do not modify the outcome of the event.
-		if (!War.isWarZone(TownyAPI.getInstance().getTownBlock(event.getLocation()).getWorldCoord()))
+		if (!TownyUniverse.getInstance().hasWarEvent(TownyAPI.getInstance().getTownBlock(event.getLocation())))
 			return;
 			
 		/*
@@ -240,7 +240,7 @@ public class WarZoneListener implements Listener {
 		/*
 		 * Is this in a Town with an Event War?
 		 */
-		boolean inEventWarTown = TownyAPI.getInstance().isWarTime() && War.isWarringTown(TownyAPI.getInstance().getTown(event.getLocation()));
+		boolean inEventWarTown = TownyAPI.getInstance().isWarTime() && TownyUniverse.getInstance().hasWarEvent(event.getTownBlock());
 
 		/*
 		 * Event War (inWarringTown) & Flag War (isWarZone(coord)) fire control settings.

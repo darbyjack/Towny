@@ -17,7 +17,6 @@ import com.palmergames.bukkit.towny.regen.TownyRegenAPI;
 import com.palmergames.bukkit.towny.tasks.MobRemovalTimerTask;
 import com.palmergames.bukkit.towny.utils.CombatUtil;
 import com.palmergames.bukkit.towny.utils.EntityTypeUtil;
-import com.palmergames.bukkit.towny.war.eventwar.War;
 import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.ItemLists;
 
@@ -158,7 +157,7 @@ public class TownyEntityListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if (!War.isWarringTown(bTown)) {
+							if (TownyUniverse.getInstance().hasWarEvent(bTown)) {
 								event.setCancelled(true);
 								return;
 							}							
@@ -205,7 +204,7 @@ public class TownyEntityListener implements Listener {
 					}
 					
 					//Cancel because one of the two players are no longer involved in the war.
-					if (!War.isWarringTown(defenderTown) || !War.isWarringTown(attackerTown)) {
+					if (!TownyUniverse.getInstance().hasWarEvent(defenderTown) || !TownyUniverse.getInstance().hasWarEvent(attackerTown)) {
 						TownyMessaging.sendMessage(attacker, Translation.of("msg_war_a_player_has_been_removed_from_war"));
 						event.setCancelled(true);
 						return;
