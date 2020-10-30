@@ -61,6 +61,7 @@ public class Town extends Government implements TownBlockOwner {
 	private int conqueredDays;
 	private final ConcurrentHashMap<WorldCoord, TownBlock> townBlocks = new ConcurrentHashMap<>();
 	private final TownyPermission permissions = new TownyPermission();
+	private boolean hasActiveWar = false;
 
 	public Town(String name) {
 		super(name);
@@ -1310,6 +1311,14 @@ public class Town extends Government implements TownBlockOwner {
 		} catch (EconomyException ignored) {}
 
 		return false;
+	}
+	
+	public boolean hasActiveWar() {
+		return hasActiveWar;
+	}
+	
+	public void setActiveWar(boolean active) {
+		this.hasActiveWar = active;
 	}
 
 	/**
