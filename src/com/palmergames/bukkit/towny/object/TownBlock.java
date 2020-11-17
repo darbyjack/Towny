@@ -375,6 +375,9 @@ public class TownBlock extends TownyObject {
 		return getWorld().getName() + " (" + getCoord() + ")";
 	}
 
+	/*
+	 * Flag war only.
+	 */
 	public boolean isWarZone() {
 
 		return getWorld().isWarZone(getCoord());

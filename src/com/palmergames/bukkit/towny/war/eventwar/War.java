@@ -39,9 +39,6 @@ public class War {
 
 	double warSpoilsAtStart = 0.0;
 	WarSpoils warSpoils = new WarSpoils();
-	
-	private boolean warTime = false;
-
 
 	/**
 	 * Creates a new War instance.
@@ -126,8 +123,6 @@ public class War {
 	public void start() {
 		
 		warParticipants.outputParticipants(warType, warName);
-
-		warTime = true;
 
 		// Start the WarTimerTask if the war type allows for using townblock HP system.
 		if (warType.hasTownBlockHP)
@@ -325,7 +320,4 @@ public class War {
 		} catch (EconomyException e1) {}
 	}
 
-	 // required while we still have /ta toggle war command.
-	@Deprecated
-	public boolean isWarTime() {return warTime;}
 }

@@ -157,7 +157,7 @@ public class TownyEntityListener implements Listener {
 								event.setCancelled(true);
 								return;
 							}
-							if (TownyUniverse.getInstance().hasWarEvent(bTown)) {
+							if (!TownyUniverse.getInstance().hasWarEvent(bTown)) {
 								event.setCancelled(true);
 								return;
 							}							

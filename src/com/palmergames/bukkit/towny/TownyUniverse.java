@@ -821,6 +821,11 @@ public class TownyUniverse {
      	return false;
     }
 
+	public boolean isWarTime() {	
+
+		return !wars.isEmpty();
+	}
+    
     public List<War> getWars() {
     	return wars;
     }
