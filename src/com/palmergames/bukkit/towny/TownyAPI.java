@@ -15,7 +15,6 @@ import com.palmergames.bukkit.towny.object.PlayerCache.TownBlockStatus;
 import com.palmergames.bukkit.towny.object.metadata.CustomDataField;
 import com.palmergames.bukkit.towny.permissions.TownyPermissionSource;
 import com.palmergames.bukkit.towny.tasks.TeleportWarmupTimerTask;
-import com.palmergames.bukkit.towny.war.eventwar.War;
 import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.util.MathUtil;
 import org.bukkit.Bukkit;
@@ -402,21 +401,6 @@ public class TownyAPI {
                 TownySettings.getTeleportWarmupTime() * 20);
     }
     
-    /**
-     * Gets the {@link War} that is currently active
-     
-     * @return the currently active {@link War}, null if none is active.
-     * @deprecated use {@link TownyUniverse#getWarEvent()} 
-     */
-    public War getWarEvent() {
-        return com.palmergames.bukkit.towny.TownyUniverse.getInstance().getWarEvent();
-    }
-//    
-//    public void clearWarEvent() {
-//        TownyUniverse townyUniverse = TownyUniverse.getInstance();
-//        townyUniverse.getWarEvent().cancelTasks(BukkitTools.getScheduler());
-//        townyUniverse.setWarEvent(null);
-//    }
     public void requestTeleport(Player player, Location spawnLoc) {
         
         try {

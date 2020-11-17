@@ -78,7 +78,6 @@ public class TownyUniverse {
     private final String rootFolder;
     private TownyDataSource dataSource;
     private TownyPermissionSource permissionSource;
-    private War warEvent;
     private List<War> wars = new ArrayList<>();
 
     private TownyUniverse() {
@@ -768,39 +767,6 @@ public class TownyUniverse {
 	 * War Stuff
 	 */
 
-//    public void startWarEvent() {
-//        warEvent = new War(towny, TownySettings.getWarTimeWarningDelay());
-//    }
-    
-    public void endWarEvent() {
-        if (warEvent != null && warEvent.isWarTime()) {
-            warEvent.end(true);
-        }
-    }	
-
-    public void addWarZone(WorldCoord worldCoord) {
-        try {
-        	if (worldCoord.getTownyWorld().isWarAllowed())
-            	worldCoord.getTownyWorld().addWarZone(worldCoord);
-        } catch (NotRegisteredException e) {
-            // Not a registered world
-        }
-        towny.updateCache(worldCoord);
-    }
-    
-    public void removeWarZone(WorldCoord worldCoord) {
-        try {
-            worldCoord.getTownyWorld().removeWarZone(worldCoord);
-        } catch (NotRegisteredException e) {
-            // Not a registered world
-        }
-        towny.updateCache(worldCoord);
-    }
-
-    public War getWarEvent() {
-        return warEvent;
-    }
-    
     public War getWarEvent(Player player) {
     	Resident resident = null;
 		try {
@@ -809,7 +775,7 @@ public class TownyUniverse {
 		if (resident == null)
 			return null;
         for (War war : getWars()) {
-        	if (war.isWarringResident(resident))
+        	if (war.getWarParticipants().has(resident))
         		return war;
         }
         return null;
@@ -817,7 +783,15 @@ public class TownyUniverse {
     
     public War getWarEvent(TownBlock townBlock) {
     	for (War war : getWars()) {
-    		if (war.isWarZone(townBlock.getWorldCoord()))
+    		if (war.getWarZoneManager().isWarZone(townBlock.getWorldCoord()))
+    			return war;
+    	}
+    	return null;
+    }
+    
+    public War getWarEvent(String warName) {
+    	for (War war : getWars()) {
+    		if (war.getWarName().equalsIgnoreCase(warName))
     			return war;
     	}
     	return null;
@@ -825,7 +799,7 @@ public class TownyUniverse {
 
     public boolean hasWarEvent(TownBlock townBlock) {
     	for (War war : getWars()) {
-    		if (war.isWarZone(townBlock.getWorldCoord()))
+    		if (war.getWarZoneManager().isWarZone(townBlock.getWorldCoord()))
     			return true;
     	}
     	return false;
@@ -833,7 +807,7 @@ public class TownyUniverse {
     
     public boolean hasWarEvent(Town town) {
     	for (War war : getWars()) {
-    		if (war.isWarringTown(town))
+    		if (war.getWarParticipants().has(town))
     			return true;
     	}
     	return false;
@@ -841,17 +815,22 @@ public class TownyUniverse {
     
     public boolean hasWarEvent(Resident resident) {
      	for (War war : getWars()) {
-     		if (war.isWarringResident(resident))
+     		if (war.getWarParticipants().has(resident))
 				return true;
      	}
      	return false;
     }
-    public void setWarEvent(War warEvent) {
-        this.warEvent = warEvent;
-    }
-    
+
     public List<War> getWars() {
     	return wars;
+    }
+    
+    public List<String> getWarNames() {
+    	List<String> names = new ArrayList<String>(wars.size());
+    	for (War war : getWars())
+    		names.add(war.getWarName());
+    	
+    	return names;
     }
     
     public void addWar(War war) {
@@ -861,6 +840,27 @@ public class TownyUniverse {
     public void removeWar(War war) {
     	war = null;
     	wars.remove(war);
+    }
+
+    // Used by FlagWar only.
+    public void addWarZone(WorldCoord worldCoord) {
+        try {
+        	if (worldCoord.getTownyWorld().isWarAllowed())
+            	worldCoord.getTownyWorld().addWarZone(worldCoord);
+        } catch (NotRegisteredException e) {
+            // Not a registered world
+        }
+        towny.updateCache(worldCoord);
+    }
+
+    // Used by FlagWar only.
+    public void removeWarZone(WorldCoord worldCoord) {
+        try {
+            worldCoord.getTownyWorld().removeWarZone(worldCoord);
+        } catch (NotRegisteredException e) {
+            // Not a registered world
+        }
+        towny.updateCache(worldCoord);
     }
     
     @Deprecated

@@ -104,11 +104,12 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 	);
 
 	private static final List<String> adminWarTabCompletes = Arrays.asList(
-			"riot",
-			"townwar",
-			"civilwar",
-			"nationwar",
-			"worldwar"
+		"riot",
+		"townwar",
+		"civilwar",
+		"nationwar",
+		"worldwar",
+		"list"
 	);
 	
 	private static final List<String> adminTownTabCompletes = Arrays.asList(
@@ -280,6 +281,10 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 						return getTownyStartingWith(args[2], "r");
 					} else if (args.length == 4) {
 						return NameUtil.filterByStart(BaseCommand.setOnOffCompletes, args[3]);
+					}
+				} else if (args.length >= 3 && args[1].equalsIgnoreCase("war")) {
+					if (args.length == 3) {
+						return TownyUniverse.getInstance().getWarNames();
 					}
 				} else if (args.length == 3) {
 					return NameUtil.filterByStart(BaseCommand.setOnOffCompletes, args[2]);
@@ -1831,7 +1836,7 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 		if (split.length == 0) {
 			// command was '/townyadmin toggle'
 			player.sendMessage(ChatTools.formatTitle("/townyadmin toggle"));
-			player.sendMessage(ChatTools.formatCommand("", "/townyadmin toggle", "war", ""));
+			player.sendMessage(ChatTools.formatCommand("", "/townyadmin toggle", "war {warname}", ""));
 			player.sendMessage(ChatTools.formatCommand("", "/townyadmin toggle", "peaceful", ""));
 			player.sendMessage(ChatTools.formatCommand("", "/townyadmin toggle", "devmode", ""));
 			player.sendMessage(ChatTools.formatCommand("", "/townyadmin toggle", "debug", ""));
@@ -1845,16 +1850,13 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 			throw new TownyException(Translation.of("msg_err_command_disable"));
 
 		if (split[0].equalsIgnoreCase("war")) {
-			if (!choice.orElse(!TownyAPI.getInstance().isWarTime())) {
-				List<Nation> nations = new ArrayList<>();
-				for (Nation nation : TownyUniverse.getInstance().getNationsMap().values())
-					nations.add(nation);
-				new War(plugin,TownySettings.getWarTimeWarningDelay(), nations, null, null, WarType.WORLDWAR);
-				TownyMessaging.sendMsg(getSender(), Translation.of("msg_war_started"));
-			} else {
-				townyUniverse.endWarEvent();
-				TownyMessaging.sendMsg(getSender(), Translation.of("msg_war_ended"));
-			}
+				if (split.length == 1) {
+					player.sendMessage(ChatTools.formatTitle("/townyadmin toggle war "));
+					player.sendMessage(ChatTools.formatCommand("", "/townyadmin toggle war", "{warname}", ""));
+					return;
+				}
+				endWar(StringMgmt.remFirstArg(split));
+
 		} else if (split[0].equalsIgnoreCase("peaceful") || split[0].equalsIgnoreCase("neutral")) {
 
 			try {
@@ -1916,6 +1918,17 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 			// parameter error message
 			// peaceful/war/townmobs/worldmobs
 			TownyMessaging.sendErrorMsg(getSender(), Translation.of("msg_err_invalid_choice"));
+		}
+	}
+
+	private void endWar(String[] args) {
+		
+		String warName = StringMgmt.join(args);	
+		
+		War war = TownyUniverse.getInstance().getWarEvent(warName);
+		if (war != null) {
+			war.end(true);
+			TownyMessaging.sendMsg(getSender(), Translation.of("msg_war_ended")); // TODO: New Language String.
 		}
 	}
 
@@ -2170,6 +2183,15 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 					nations.add(nation);
 				new War(plugin,TownySettings.getWarTimeWarningDelay(), nations, null, null, WarType.WORLDWAR);
 				return;
+			} else if (split[0].equalsIgnoreCase("list")) {
+				sender.sendMessage(ChatTools.formatTitle("Ongoing Wars"));
+				if (TownyUniverse.getInstance().getWarNames().isEmpty()) {
+					sender.sendMessage(ChatTools.formatCommand("None", "", ""));
+					return;
+				}
+				for (War war : TownyUniverse.getInstance().getWars()) {
+					sender.sendMessage(ChatTools.formatCommand("War Name: " + war.getWarName(), "Type: " + war.getWarType().getName(), ""));
+				}
 			} else {
 				showWarHelp();
 			}
@@ -2235,6 +2257,7 @@ public class TownyAdminCommand extends BaseCommand implements CommandExecutor {
 		sender.sendMessage(ChatTools.formatCommand("", "/townyadmin war", "CIVILWAR [nation]", ""));
 		sender.sendMessage(ChatTools.formatCommand("", "/townyadmin war", "NATIONWAR [nation] [nation]", ""));
 		sender.sendMessage(ChatTools.formatCommand("", "/townyadmin war", "WORLDWAR", ""));
+		sender.sendMessage(ChatTools.formatCommand("", "/townyadmin war", "list", ""));
 	}
 
 }
