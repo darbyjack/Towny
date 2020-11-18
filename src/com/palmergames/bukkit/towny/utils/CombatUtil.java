@@ -134,7 +134,7 @@ public class CombatUtil {
 				/*
 				 * Defending player is in a warzone
 				 */
-				if (world.isWarZone(coord) && !preventFriendlyFire(attackingPlayer, defendingPlayer, world))
+				if (world.isFlagWarZone(coord) && !preventFriendlyFire(attackingPlayer, defendingPlayer, world))
 					return false;
 
 				/*

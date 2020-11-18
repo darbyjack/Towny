@@ -65,7 +65,7 @@ public class FlagWarCustomListener implements Listener {
 		TownyUniverse universe = TownyUniverse.getInstance();
 
 		WorldCoord worldCoord = new WorldCoord(cell.getWorldName(), cell.getX(), cell.getZ());
-		universe.removeWarZone(worldCoord);
+		universe.removeFlagWarZone(worldCoord);
 
 		plugin.updateCache(worldCoord);
 
@@ -136,7 +136,7 @@ public class FlagWarCustomListener implements Listener {
 			Nation attackingNation = attackingTown.getNation();
 
 			WorldCoord worldCoord = FlagWar.cellToWorldCoord(cell);
-			universe.removeWarZone(worldCoord);
+			universe.removeFlagWarZone(worldCoord);
 
 			TownBlock townBlock = worldCoord.getTownBlock();
 			Town defendingTown = townBlock.getTown();
@@ -235,7 +235,7 @@ public class FlagWarCustomListener implements Listener {
 		TownyUniverse universe = TownyUniverse.getInstance();
 
 		WorldCoord worldCoord = new WorldCoord(cell.getWorldName(), cell.getX(), cell.getZ());
-		universe.removeWarZone(worldCoord);
+		universe.removeFlagWarZone(worldCoord);
 		plugin.updateCache(worldCoord);
 
 		System.out.println(cell.getCellString());
