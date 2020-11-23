@@ -58,6 +58,7 @@ public class TownyUniverse {
     private static TownyUniverse instance;
     private final Towny towny;
     
+    private final Map<UUID, String> residentUUIDNameMap = new ConcurrentHashMap<>();
     private final Map<String, Resident> residents = new ConcurrentHashMap<>();
     private final Trie residentsTrie = new Trie();
     
@@ -183,6 +184,7 @@ public class TownyUniverse {
         townNameMap.clear();
         townUUIDMap.clear();
         residents.clear();
+        residentUUIDNameMap.clear();
         townBlocks.clear();
     }
     
@@ -337,6 +339,10 @@ public class TownyUniverse {
     	return nationsTrie;
 	}
 	
+    public Map<UUID, String> getResidentUUIDNameMap() {
+    	return residentUUIDNameMap;
+    }
+    
     public Map<String, Resident> getResidentMap() {
         return residents;
     }
