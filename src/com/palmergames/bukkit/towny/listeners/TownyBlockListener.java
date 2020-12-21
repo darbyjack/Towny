@@ -12,6 +12,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,6 +25,9 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 
 import java.util.List;
 
@@ -67,6 +73,28 @@ public class TownyBlockListener implements Listener {
 		 */
 		if (block.getType() == Material.FIRE && block.getRelative(BlockFace.DOWN).getType() == Material.OBSIDIAN)
 			return;
+		
+		// Fix - https://github.com/TownyAdvanced/Towny/issues/4610
+		if (block.getType() == Material.CHEST && block.getState() instanceof DoubleChest) {
+			final DoubleChest chest = (DoubleChest) block.getState();
+			final InventoryHolder left = chest.getLeftSide();
+			final InventoryHolder right = chest.getRightSide();
+			
+			if (left == null || right == null) {
+				return;
+			}
+			
+			final Location leftLoc = left.getInventory().getLocation();
+			final Location rightLoc = right.getInventory().getLocation();
+			
+			if (leftLoc == null || rightLoc == null) {
+				return;
+			}
+			
+			if (!testBlockMove(leftLoc.getBlock(), rightLoc.getBlock())) {
+				event.setCancelled(true);
+			}
+		}
 
 		//Cancel based on whether this is allowed using the PlayerCache and then a cancellable event.
 		if (!TownyActionEventExecutor.canBuild(event.getPlayer(), block.getLocation(), block.getType())) {
@@ -150,21 +178,19 @@ public class TownyBlockListener implements Listener {
 
 	/**
 	 * Decides whether blocks moved by pistons follow the rules.
-	 * 
+	 *
 	 * @param block - block that is being moved.
-	 * @param direction - direction the piston is facing.
-	 * 
+	 * @param target - target block being checked
+	 *
 	 * @return true if block is able to be moved. 
 	 */
-	private boolean testBlockMove(Block block, BlockFace direction) {
-
-		Block blockTo = block.getRelative(direction);
+	private boolean testBlockMove(Block block, Block target) {
 		Location loc = block.getLocation();
-		Location locTo = blockTo.getLocation();
+		Location targetLoc = target.getLocation();
 		TownBlock currentTownBlock = null, destinationTownBlock = null;
 
 		currentTownBlock = TownyAPI.getInstance().getTownBlock(loc);
-		destinationTownBlock = TownyAPI.getInstance().getTownBlock(locTo);
+		destinationTownBlock = TownyAPI.getInstance().getTownBlock(targetLoc);
 
 		if (currentTownBlock != destinationTownBlock) {
 			// Cancel if either is not null, but other is (wild to town).
@@ -180,7 +206,7 @@ public class TownyBlockListener implements Listener {
 			try {
 				if ((!currentTownBlock.hasResident() && destinationTownBlock.hasResident()) || (currentTownBlock.hasResident() && !destinationTownBlock.hasResident()) || (currentTownBlock.getResident() != destinationTownBlock.getResident())
 
-				|| (currentTownBlock.getPlotPrice() != -1) || (destinationTownBlock.getPlotPrice() != -1)) {
+					|| (currentTownBlock.getPlotPrice() != -1) || (destinationTownBlock.getPlotPrice() != -1)) {
 					return true;
 				}
 			} catch (NotRegisteredException e) {
@@ -190,6 +216,18 @@ public class TownyBlockListener implements Listener {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Decides whether blocks moved by pistons follow the rules.
+	 * 
+	 * @param block - block that is being moved.
+	 * @param direction - direction the piston is facing.
+	 * 
+	 * @return true if block is able to be moved. 
+	 */
+	private boolean testBlockMove(Block block, BlockFace direction) {
+		return testBlockMove(block, block.getRelative(direction));
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
